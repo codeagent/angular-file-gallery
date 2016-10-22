@@ -1,0 +1,30 @@
+<form class="form-horizontal">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="form-group">
+				<label for="fg-grayscale-red" class="col-sm-5 control-label">{{'Red weight:' | fgI18n}} </label>
+
+				<div class="col-sm-4">
+					<input type="number" ng-model="operation.params.red" ng-model-options="{debounce: 500}" step="0.01"
+						   min="0.0" max="1.0" class="form-control input-sm" id="fg-grayscale-red">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="fg-grayscale-green" class="col-sm-5 control-label">{{'Green weight:' | fgI18n}} </label>
+
+				<div class="col-sm-4">
+					<input type="number" ng-model="operation.params.green" ng-model-options="{debounce: 500}"
+						   step="0.01" min="0.0" max="1.0" class="form-control input-sm" id="fg-grayscale-green">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="fg-grayscale-blue" class="col-sm-5 control-label">{{'Blue weight:' | fgI18n}} </label>
+
+				<div class="col-sm-4">
+					<input type="number" ng-model="operation.params.blue" ng-model-options="{debounce: 500}" step="0.01"
+						   min="0.0" max="1.0" class="form-control input-sm" id="fg-grayscale-blue">
+				</div>
+			</div>
+		</div>
+	</div>
+</form>

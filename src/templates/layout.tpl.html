@@ -1,0 +1,24 @@
+<div class="file-gallery">
+	<div class="btn-toolbar panes-bar" role="toolbar" aria-label="">
+
+		<div class="btn-group btn-group-sm" role="group" aria-label="">
+			<button ng-disabled="pane == 'uploader' && pending" type="button" ng-click="pane = 'gallery';"
+					class="btn btn-default">
+				<i class="glyphicon glyphicon-picture"></i>
+				{{"Gallery" | fgI18n}}
+			</button>
+
+			<button ng-disabled="pane == 'gallery' && pending" type="button" ng-click="pane = 'uploader';"
+					class="btn btn-default">
+				<i class="glyphicon glyphicon-upload"></i>
+				{{"Upload" | fgI18n}}
+			</button>
+		</div>
+
+	</div>
+	<hr/>
+	<div class="fg-pane" ng-include="'templates/file-gallery/_gallery-pane.tpl.html'" ng-if="pane == 'gallery'"></div>
+	<div class="fg-pane" ng-include="'templates/file-gallery/_upload-pane.tpl.html'" ng-if="pane == 'uploader'"></div>
+	<div class="fg-pane" ng-include="'templates/file-gallery/_settings-pane.tpl.html'" ng-if="pane == 'settings'"></div>
+
+</div>

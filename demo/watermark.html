@@ -1,0 +1,228 @@
+<!doctype>
+<html>
+<head>
+	<title>Watermark operation</title>
+	<link rel="stylesheet" href="/../vendor/bower/bootstrap/dist/css/bootstrap.css"/>
+	<link rel="stylesheet" href="/../vendor/bower/font-awesome/css/font-awesome.min.css"/>
+	<!-- Optional theme -->
+	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"> -->
+	<link rel="stylesheet" href="/dist/css/angular-file-gallery.min.css"/>
+
+	<!-- <script src="http://nervgh.github.io/js/es5-shim.min.js"></script> -->
+	<!-- <script src="http://nervgh.github.io/js/es5-sham.min.js"></script> -->
+	<script src="/../vendor/bower/jquery/dist/jquery.min.js"></script>
+	<script src="/../vendor/bower/angular/angular.min.js"></script>
+	<script src="/../vendor/bower/angular-animate/angular-animate.min.js"></script>
+	<script src="/../vendor/bower/angular-sanitize/angular-sanitize.min.js"></script>
+	<script src="/../vendor/bower/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+	<script src="/../vendor/bower/angular-file-upload/dist/angular-file-upload.min.js"></script>
+	<script src="/dist/js/angular-file-gallery.js"></script>
+
+	<!-- Watermark -->
+	<script>
+		angular
+				.module('app', ['angular-file-gallery'])
+				.constant("Watermark1", "/demo/server/samples/watermark.png")
+				.constant("Watermark2", "/demo/server/samples/watermark2.png")
+				.run(function (fileGallery, Watermark1, Watermark2, $q)
+				{
+					var raw = [];
+					function urlToData(url)
+					{
+						var image     = new Image();
+						var deferred  = $q.defer();
+						image.onerror = deferred.reject;
+						image.onload  = function ()
+						{
+							var canvas    = document.createElement('canvas');
+							canvas.width  = this.width;
+							canvas.height = this.height;
+							var context   = canvas.getContext('2d');
+							context.drawImage(image, 0, 0);
+							deferred.resolve(context.getImageData(0, 0, this.width, this.height));
+						};
+						image.src     = url;
+						return deferred.promise;
+					}
+					function interpolate(a, b, factor)
+					{
+						return Math.round((b - a) * factor / 255 + a);
+					}
+					fileGallery
+						.operation('watermark', {
+							name:        'Watermark',
+							icon:        'fa fa-tint',
+							templateUrl: 'templates/watermark.tpl.html',
+							controller:  ['$scope', '$q', function ($scope, $q)
+							{
+								$scope.disabled = true;
+								var promises = $scope.operation.params.watermarks.map(function(w) {
+									return urlToData(w);
+								});
+								$q
+									.all(promises)
+									.then(function(w) {
+										raw = w;
+										$scope.operation.params.active = 0;
+									})
+									.catch(function(){
+										console.error("Cannot resolve watermark source");
+									})
+									.finally(function() {
+										$scope.disabled = false;
+									});
+							}],
+							params:      {
+								top: 0, left: 0, watermarks: [Watermark1, Watermark2], active: -1
+							},
+							operation:   function (imageData) {
+								if(!raw.length)
+								{
+									return imageData;
+								}
+								var watermark = raw[this.params.active],
+									width = Math.min(watermark.width + this.params.left, imageData.width),
+									height = Math.min(watermark.height + this.params.top, imageData.height);
+
+								for (var y = this.params.top; y < height; y++)
+								{
+									for (var x = this.params.left; x < width; x++) {
+										var srcOffset = (y * imageData.width + x) * 4,
+											wOffset = ((y -  this.params.top) * watermark.width + x - this.params.left) * 4,
+											alpha = watermark.data[wOffset + 3];
+
+										imageData.data[srcOffset] = interpolate(imageData.data[srcOffset], watermark.data[wOffset], alpha);     // red
+										imageData.data[srcOffset + 1] = interpolate(imageData.data[srcOffset + 1], watermark.data[wOffset + 1], alpha); // green
+										imageData.data[srcOffset + 2] = interpolate(imageData.data[srcOffset + 2], watermark.data[wOffset + 2], alpha); // blue
+										wOffset += 4;
+									}
+								}
+								return imageData;
+							}
+						});
+				});
+	</script>
+
+	<script>
+		angular
+				.module('app')
+				.constant("Img", "/demo/server/samples/nature.jpg")
+				.run(function (fileGallery)
+				{
+					fileGallery
+							.register('demo', {
+								'gallery': {
+									url: '/demo/server',
+									operations: ['crop', 'resize', 'reflection', 'grayscale', 'watermark']
+								},
+								'uploader': {
+									url:     '/demo/server',
+									filters: ['image']
+								}
+							});
+				})
+				.factory('imageToFile', function ($q) {
+
+					function dataURItoBlob(dataURI) {
+						// convert base64/URLEncoded data component to raw binary data held in a string
+						var byteString;
+						if (dataURI.split(',')[0].indexOf('base64') >= 0)
+							byteString = atob(dataURI.split(',')[1]);
+						else
+							byteString = unescape(dataURI.split(',')[1]);
+
+						// separate out the mime component
+						var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+						// write the bytes of the string to a typed array
+						var ia = new Uint8Array(byteString.length);
+						for (var i = 0; i < byteString.length; i++) {
+							ia[i] = byteString.charCodeAt(i);
+						}
+
+						return new Blob([ia], {type:mimeString});
+					}
+
+					return function (url) {
+						return $q(function (resolve, reject) {
+							var image = new Image();
+							image.onload = function () {
+								var canvas = document.createElement('canvas');
+								canvas.width = this.width;
+								canvas.height = this.height;
+								var context = canvas.getContext("2d");
+								context.drawImage(this, 0, 0);
+								var blob = dataURItoBlob(canvas.toDataURL());
+								blob.lastModifiedDate = new Date();
+								blob.name = url.match(/[^\/]+$/)[0];
+								resolve(blob);
+							};
+							image.onerror = reject;
+							image.src = url;
+						});
+					};
+				})
+				.controller("Controller", function ($scope, Img, imageToFile) {
+
+					imageToFile(Img)
+							.then(function(file){
+								$scope.file = file;
+							});
+
+					$scope.apply = function(file) {
+						console.log(file);
+					};
+				});
+	</script>
+
+
+	<style>
+		.container {
+			margin-top: 10px;
+		}
+	</style>
+</head>
+
+<body ng-app="app">
+	<script type="text/ng-template" id="templates/watermark.tpl.html">
+		<form class="form-horizontal">
+			<div class="row">
+				<div class="col-xs-6">
+					<p ng-repeat="w in operation.params.watermarks">
+						<a href="" class="display-block" ng-click="operation.params.active = $index">
+							<img ng-src="{{w}}" class="img-responsive img-thumbnail"
+								 ng-class="{'bg-info': $index == operation.params.active }"/>
+						</a>
+					</p>
+				</div>
+				<div class="col-xs-6">
+					<div class="form-group">
+						<label for="fg-watermark-top" class="col-sm-4 control-label">{{'Top:' | fgI18n}} </label>
+
+						<div class="col-sm-8">
+							<input ng-disabled="disabled" type="number" ng-model="operation.params.top" ng-model-options="{debounce: 500}"
+								   step="1"
+								   min="0" class="form-control input-sm" id="fg-watermark-top">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="fg-watermark-left" class="col-sm-4 control-label">{{'Left:' | fgI18n}} </label>
+
+						<div class="col-sm-8">
+							<input ng-disabled="disabled" type="number" ng-model="operation.params.left" ng-model-options="{debounce: 500}"
+								   step="1"
+								   min="0" class="form-control input-sm" id="fg-watermark-left">
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</script>
+	<div class="container" ng-controller="Controller">
+
+		<h2>File gallery operation pane</h2>
+		<hr/>
+		<file-gallery-settings ng-if="file" gallery="demo" file="file" apply="apply(file)"></file-gallery-settings>
+	</div>
+</body>
+</html>

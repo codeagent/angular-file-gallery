@@ -1,0 +1,58 @@
+<div class="fg-settings-pane">
+	<div class="row">
+		<div class="col-xs-6">
+			<div class="btn-group btn-group-sm" uib-dropdown>
+				<button id="single-button" type="button" class="btn btn-default" uib-dropdown-toggle
+						ng-disabled="disabled">
+					<i class="glyphicon glyphicon-cog"></i> {{'Operation' | fgI18n}} <span class="caret"></span>
+				</button>
+				<ul class="uib-dropdown-menu" role="menu" aria-labelledby="single-button">
+					<li role="menuitem" ng-repeat="operation in operations.all track by $index">
+						<a href="" ng-click="add(operation)">
+							<small><i class="{{operation.icon}}"></i> {{operation.name}}</small>
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="btn-toolbar btn-group-sm pull-right" ng-if="operations.selected.length">
+				<button class="btn btn-default" uib-popover-template="'templates/file-gallery/_reset-popover.tpl.html'"
+						popover-is-open="popover"
+						popover-placement="right"
+						popover-append-to-body="true"
+						popover-trigger="focus">
+					<i class="glyphicon glyphicon-refresh"></i>
+					{{'Reset' | fgI18n}}
+				</button>
+				<button class="btn btn-warning" ng-click="make()">
+					<i class="glyphicon glyphicon-ok"></i>
+					{{'Apply' | fgI18n}}
+				</button>
+			</div>
+			<hr/>
+			<div class="fg-op-list-container" ng-style="{'max-height': previewSize + 'px'}">
+				<div class="fg-op-wrapper" ng-repeat="operation in operations.selected track by $index"
+					 ng-include="'templates/file-gallery/_operation.tpl.html'"></div>
+			</div>
+		</div>
+		<div class="col-xs-6 fg-preview-container">
+			<ul class="nav nav-tabs">
+				<li role="presentation" ng-class="{active: source}">
+					<a href="" ng-click="source=true">{{'Source' | fgI18n}}</a>
+				</li>
+				<li role="presentation" ng-class="{active: !source}">
+					<a href="#" ng-click="source=false">{{'Result' | fgI18n}}</a>
+				</li>
+			</ul>
+			<br/>
+
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane" ng-class="{active: source}">
+					<canvas class="fg-source-canvas"></canvas>
+				</div>
+				<div role="tabpanel" class="tab-pane" ng-class="{active: !source}">
+					<canvas class="fg-result-canvas"></canvas>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,110 @@
+<!doctype>
+<html>
+<head>
+    <title>Angular file gallery</title>
+    <link rel="stylesheet" href="/../vendor/bower/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/../vendor/bower/font-awesome/css/font-awesome.min.css"/>
+    <!-- Optional theme -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"> -->
+    <link rel="stylesheet" href="/dist/css/angular-file-gallery.min.css"/>
+
+    <!-- <script src="http://nervgh.github.io/js/es5-shim.min.js"></script> -->
+    <!-- <script src="http://nervgh.github.io/js/es5-sham.min.js"></script> -->
+    <script src="/../vendor/bower/jquery/dist/jquery.min.js"></script>
+    <script src="/../vendor/bower/angular/angular.min.js"></script>
+    <script src="/../vendor/bower/angular-animate/angular-animate.min.js"></script>
+    <script src="/../vendor/bower/angular-sanitize/angular-sanitize.min.js"></script>
+    <script src="/../vendor/bower/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="/../vendor/bower/angular-file-upload/dist/angular-file-upload.min.js"></script>
+    <script src="/dist/js/angular-file-gallery.js"></script>
+
+    <script>
+        angular
+                .module('app', ['angular-file-gallery'])
+                .constant("ImageA", "/demo/server/upload/images27.jpg")
+                .constant("ImageB", "/demo/server/upload/71.jpg")
+                .constant("ImageC", "/demo/server/upload/food-q-c-720-256-21.jpg")
+                .constant("ImageD", "/demo/server/upload/nature-h-c-256-720-31.jpg")
+                .run(function (fileGallery) {
+                    fileGallery
+                        .register('demo', {
+                            'gallery': {
+                                url: '/demo/server',
+                                operations: ['crop', 'resize', 'reflection', 'grayscale']
+                            },
+                            'uploader': {
+                                url:     '/demo/server',
+                                filters: ['image']
+                            }
+                        });
+                })
+                .factory('imageToFile', function ($q) {
+
+                    function dataURItoBlob(dataURI) {
+                        // convert base64/URLEncoded data component to raw binary data held in a string
+                        var byteString;
+                        if (dataURI.split(',')[0].indexOf('base64') >= 0)
+                            byteString = atob(dataURI.split(',')[1]);
+                        else
+                            byteString = unescape(dataURI.split(',')[1]);
+
+                        // separate out the mime component
+                        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+                        // write the bytes of the string to a typed array
+                        var ia = new Uint8Array(byteString.length);
+                        for (var i = 0; i < byteString.length; i++) {
+                            ia[i] = byteString.charCodeAt(i);
+                        }
+
+                        return new Blob([ia], {type:mimeString});
+                    }
+
+                    return function (url) {
+                        return $q(function (resolve, reject) {
+                            var image = new Image();
+                            image.onload = function () {
+                                var canvas = document.createElement('canvas');
+                                canvas.width = this.width;
+                                canvas.height = this.height;
+                                var context = canvas.getContext("2d");
+                                context.drawImage(this, 0, 0);
+                                var blob = dataURItoBlob(canvas.toDataURL());
+                                blob.lastModifiedDate = new Date();
+                                blob.name = url.match(/[^\/]+$/)[0];
+                                resolve(blob);
+                            };
+                            image.onerror = reject;
+                            image.src = url;
+                        });
+                    };
+                })
+                .controller("Controller", function ($scope, ImageA, ImageB, ImageC, ImageD, imageToFile) {
+
+                    imageToFile(ImageC)
+                        .then(function(file){
+                            $scope.file = file;
+                        });
+
+                    $scope.apply = function(file) {
+                        console.log(file);
+                    };
+                });
+    </script>
+
+    <style>
+        .container {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body ng-app="app">
+<div class="container" ng-controller="Controller">
+
+    <h2>File gallery operation pane</h2>
+    <hr/>
+    <file-gallery-settings ng-if="file" gallery="demo" file="file" apply="apply(file)"></file-gallery-settings>
+</div>
+</body>
+</html>

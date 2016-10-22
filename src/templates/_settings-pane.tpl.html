@@ -1,0 +1,9 @@
+<h4>
+	<i class="glyphicon glyphicon-cog"></i>
+	{{'File settings' | fgI18n}}
+	<a href="" ng-click="collapseSettings()" class="btn btn-default btn-sm pull-right" title="{{'Collapse'|fgI18n}}">
+		<i class="glyphicon glyphicon-triangle-left"></i>
+	</a>
+</h4>
+<hr/>
+<file-gallery-settings gallery="{{name}}" file="targetItem._file" apply="appySettings(file)"></file-gallery-settings>

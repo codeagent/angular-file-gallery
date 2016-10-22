@@ -1,0 +1,37 @@
+<div class="fg-gallery-toolbar text-right">
+	<form class="form-inline">
+		<div class="form-group">
+			<input type="text" class="form-control input-sm" ng-disabled="pending" ng-model-options="{debounce: 1000}"
+				   placeholder="{{'Name' | fgI18n}}" ng-model="$parent.filter.name">
+		</div>
+		<div class="form-group">
+			<select class="form-control input-sm" ng-disabled="pending" ng-model="$parent.filter.type"
+					ng-options="option.id as option.label for option in typeFilterOptions"></select>
+		</div>
+		<button type="button" class="btn btn-default btn-sm" ng-disabled="pending" ng-click="resetGallery()"
+				title="{{'Reload' | fgI18n}}">
+			<i class="glyphicon glyphicon-refresh"></i>&nbsp;
+		</button>
+		<button type="button" class="btn btn-default btn-sm " ng-click="$parent.view = 'list';"
+				ng-show="view == 'tile';" title="{{'List' | fgI18n}}">
+			<i class="glyphicon glyphicon-th-list"></i>&nbsp;
+		</button>
+		<button type="button" class="btn btn-default btn-sm" ng-click="$parent.view = 'tile';" ng-show="view == 'list';"
+				title="{{'Tile' | fgI18n}}">
+			<i class="glyphicon glyphicon-th-large"></i>&nbsp;
+		</button>
+	</form>
+</div>
+<hr/>
+<div class="fg-gallery">
+	<div class="fg-pagination text-right" ng-include="'templates/file-gallery/_pagination.tpl.html'"></div>
+	<div class="fg-list-items" ng-if="view == 'list';" ng-include="'templates/file-gallery/_items-list.tpl.html'"></div>
+	<div class="fg-list-items" ng-if="view == 'tile';" ng-include="'templates/file-gallery/_items-grid.tpl.html'"></div>
+	<div class="fg-pagination text-right" ng-include="'templates/file-gallery/_pagination.tpl.html'"></div>
+</div>
+<div class="fg-picked" ng-show="selected.length">
+	<hr/>
+	<strong>{{"Picked"|fgI18n}}:</strong>
+	<a href title="{{'Remove from list' | fgI18n}}" class="fg-picked-item" ng-repeat="item in selected track by item[pickAttribute]"
+	   ng-style="{'background-image': 'url(' + item.img + ')'}" ng-click="pick(item)"></a>
+</div>

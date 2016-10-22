@@ -1,0 +1,84 @@
+<!doctype>
+<html>
+<head>
+	<title>Файловая гаререя</title>
+	<link rel="stylesheet" href="/../vendor/bower/bootstrap/dist/css/bootstrap.css"/>
+	<link rel="stylesheet" href="/../vendor/bower/font-awesome/css/font-awesome.min.css"/>
+	<!-- Optional theme -->
+	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"> -->
+	<link rel="stylesheet" href="/dist/css/angular-file-gallery.min.css"/>
+
+	<!-- <script src="http://nervgh.github.io/js/es5-shim.min.js"></script> -->
+	<!-- <script src="http://nervgh.github.io/js/es5-sham.min.js"></script> -->
+	<script src="/../vendor/bower/jquery/dist/jquery.min.js"></script>
+	<script src="/../vendor/bower/angular/angular.min.js"></script>
+	<script src="/../vendor/bower/angular-animate/angular-animate.min.js"></script>
+	<script src="/../vendor/bower/angular-sanitize/angular-sanitize.min.js"></script>
+	<script src="/../vendor/bower/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+	<script src="/../vendor/bower/angular-file-upload/dist/angular-file-upload.min.js"></script>
+	<script src="/dist/js/angular-file-gallery.min.js"></script>
+	<script src="/dist/js/angular-file-gallery-ru.min.js"></script>
+
+
+	<script>
+		angular
+				.module('app', ['angular-file-gallery'])
+				.run(function (fileGallery)
+				{
+					fileGallery
+							.register('demo', {
+								'gallery': {
+									url: '/demo/server'
+								}, 'uploader': {
+									url: '/demo/server', filters: ['image']
+								}
+							});
+				})
+				.controller("ModalController", function ($scope, fileGalleryModal)
+				{
+					$scope.selected  = [];
+					$scope.openModal = function ()
+					{
+						return fileGalleryModal.open({
+									gallery: {
+										url: '/demo/server'
+									}, uploader: {url: '/demo/server'}
+								})
+								.result
+								.then(function (selected)
+								{
+									$scope.selected = selected;
+								});
+					};
+				});
+	</script>
+
+	<style>
+		.container {
+			margin-top: 10px;
+		}
+	</style>
+</head>
+
+<body ng-app="app">
+<div class="container">
+	<div class="row" ng-controller="ModalController">
+		<div class="col-xs-12">
+			<h2>Модальное окно</h2>
+			<hr/>
+			<p><strong>Выбраны:</strong> {{selected}}</p>
+			<a href class="btn btn-primary" ng-click="openModal()">
+				<i class="glyphicon glyphicon-picture"></i> Открыть окно
+			</a>
+		</div>
+	</div>
+	<br/>
+	<br/>
+
+	<h2>Директива</h2>
+	<hr/>
+	<p><strong>Выбрано:</strong> {{selected}}</p>
+	<file-gallery name="demo" selected="selected" multiple="true" pick-attribute="name"></file-gallery>
+</div>
+</body>
+</html>

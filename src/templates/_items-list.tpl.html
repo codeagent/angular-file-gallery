@@ -1,0 +1,37 @@
+<table class="table table-condensed table-hover table-bordered table-stripped">
+	<thead>
+	<tr>
+		<th></th>
+		<th>{{'Image' | fgI18n}}</th>
+		<th>{{'Name' | fgI18n}}</th>
+		<th>{{'Type' | fgI18n}}</th>
+		<th>{{'Url' | fgI18n}}</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr ng-repeat="item in items" ng-if="!item._file && !item._error" ng-class="{'info': _pickedKeys[item[pickAttribute]]}">
+		<td class="text-left">
+			<a href class="text-primary" ng-click="pick(item)" ng-show="_pickedKeys[item[pickAttribute]]">
+				<i class="glyphicon glyphicon-check"></i>
+			</a>
+			<a href class="text-muted" ng-click="pick(item)" ng-show="!_pickedKeys[item[pickAttribute]]">
+				<i class="glyphicon glyphicon-unchecked"></i>
+			</a>
+		</td>
+		<td><img alt="{{item.name}}" class='img-responsive' ng-src="{{item.img}}" style="max-height: 32px"/></td>
+		<td>{{item.name}}</td>
+		<td>{{item.type}}</td>
+		<td>
+			<a ng-href="{{item.img}}" target="_blank" title="{{item.img}}">
+				<i class="glyphicon glyphicon-globe"></i> {{item.img}}
+			</a>
+		</td>
+	</tr>
+	<tr ng-show="!items.length">
+		<td colspan="5" class="text-center">
+			<i class="glyphicon glyphicon-picture"></i>
+			{{'No images found.' | fgI18n}}
+		</td>
+	</tr>
+	</tbody>
+</table>

@@ -1,0 +1,14 @@
+<div class="modal-header">
+	<h3 class="modal-title">
+		<i class="glyphicon glyphicon-picture"></i>
+		{{'File gallery' | fgI18n}}
+	</h3>
+</div>
+<div class="modal-body">
+	<file-gallery name="{{name}}" selected="selected" multiple="{{multiple}}"
+				  pick-attribute="{{pickAttribute}}"></file-gallery>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-primary" type="button" ng-show="selected.length" ng-click="$close(selected)">{{'Pick' | fgI18n}}</button>
+	<button class="btn btn-warning" type="button" ng-click="$dismiss(true)">{{'Close' | fgI18n}}</button>
+</div>

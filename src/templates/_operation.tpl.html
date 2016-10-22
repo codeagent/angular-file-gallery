@@ -1,0 +1,35 @@
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h4 class="panel-title">
+			<i class="{{operation.icon}}"></i>
+			<span>{{operation.name}}</span>
+
+			<div class="btn-group pull-right">
+				<a href="" ng-click="operation.disabled=!operation.disabled">
+					<i class="glyphicon" ng-class="{
+                        'glyphicon-unchecked text-muted':operation.disabled,
+                        'glyphicon-check':!operation.disabled
+                    }"></i>
+				</a>
+				<a href="" ng-click="up($index)" ng-if="$index > 0">
+					<i class="glyphicon glyphicon-arrow-up"></i>
+				</a>
+				<a href="" ng-click="down($index)" ng-if="$index < operations.selected.length - 1">
+					<i class="glyphicon glyphicon-arrow-down"></i>
+				</a>
+				<a href="" ng-click="operations.selected.splice($index, 1)">
+					<i class="text-danger glyphicon glyphicon-remove-circle"></i>
+				</a>
+				<a href="" ng-click="operation.collapsed = !operation.collapsed">
+					<i class="glyphicon" ng-class="{
+                        'glyphicon-collapse-up':!operation.collapsed,
+                        'glyphicon-collapse-down':operation.collapsed
+                    }"></i>
+				</a>
+			</div>
+		</h4>
+	</div>
+	<div class="panel-body" ng-include="operation.templateUrl" ng-controller="operation.controller"
+		 ng-show="!operation.collapsed">
+	</div>
+</div>

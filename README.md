@@ -5,6 +5,10 @@ Uploading, representing, sorting, paginating images of web formats (jpg, gif, pn
 
 For server communication look at demo/server subfolder.
 
-## Description: todo:
+## Installation:
+
+```
+npm install @codeagent/angular-file-gallery
+```
 
 For more information and demos see here: [TODO:](https://)

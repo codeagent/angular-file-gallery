@@ -11,4 +11,4 @@ For server communication look at demo/server subfolder.
 npm install @codeagent/angular-file-gallery
 ```
 
-For more information and demos see here: [TODO:](https://)
+For more information and demos see [here](http://188.120.239.91/files/demo/)
